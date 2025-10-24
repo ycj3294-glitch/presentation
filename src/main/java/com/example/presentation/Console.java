@@ -1,6 +1,7 @@
 package com.example.presentation;
 
 import com.example.presentation.model.*;
+import com.example.presentation.model.Process;
 import com.example.presentation.runing.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -18,7 +19,7 @@ public class Console implements CommandLineRunner {
     private final S1WastDao s1WastDao;
     private final S2StepDao s2StepDao;
     private final S3ProductionDao s3ProductionDao;
-
+    private final OperationsDao operationsDao;
 
 
     @Override
@@ -95,8 +96,38 @@ public class Console implements CommandLineRunner {
                             return;
                     }
                     break;
-                    // 생산 관리
-                case 2:
+                    // 생산 관리 (지시 삭제가 없습니다.)
+                case 2 :
+                    System.out.println("[1]작업지시 등록 [2]작업지시 상태 변경 [3]작업지시 조회 [4]공정 조회 [5]장비 조회 [6]종료");
+                    int prodChoice = sc.nextInt();
+                    sc.nextLine();
+                    switch (prodChoice) {
+                        case 1:
+                            boolean isSuccessWO = operationsDao.insertWorkOrder(operationsDao.regWorkOrder());
+                            System.out.println("작업지시 등록 : " + (isSuccessWO ? "성공" : "실패"));
+                            break;
+                        case 2:
+                            boolean isUpdateWO = operationsDao.updateWorkOrderStatus();
+                            System.out.println("작업지시 상태 변경 : " + (isUpdateWO ? "성공" : "실패"));
+                            break;
+                        case 3:
+                            List<WorkOrder> workOrders = operationsDao.findAllWorkOrders();
+                            System.out.println("======== 작업지시 조회 =========");
+                            for (WorkOrder wo : workOrders) System.out.println(wo);
+                            break;
+                        case 4:
+                            List<Process> processes = operationsDao.findAllProcesses();
+                            System.out.println("======== 공정 조회 =========");
+                            for (Process p : processes) System.out.println(p);
+                            break;
+                        case 5:
+                            List<Equipment> equipments = operationsDao.findAllEquipments();
+                            System.out.println("======== 장비 조회 =========");
+                            for (Equipment e : equipments) System.out.println(e);
+                            break;
+                        case 6: break; // 하위 메뉴 종료, 상위 메뉴 반복
+                    }
+                    break;
                     // 자재/설비 관리
                 case 3:
                     // 폐기 관리
