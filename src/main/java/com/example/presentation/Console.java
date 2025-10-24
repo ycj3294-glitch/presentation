@@ -15,8 +15,10 @@ public class Console implements CommandLineRunner {
     private final EmployeeDao employeeDao;
     private final ProductDao productDao;
     private final WasteDao wasteDao;
-    private final S1ProductionDao s1ProductionDao;
+    private final S1WastDao s1WastDao;
     private final S2StepDao s2StepDao;
+    private final S3ProductionDao s3ProductionDao;
+
 
 
     @Override
@@ -24,7 +26,8 @@ public class Console implements CommandLineRunner {
 
         while (true) {
             System.out.println("====== 콘솔 공장 관리 시스템 ======");
-            System.out.println("[1]기준 정보 관리 [2]생산 관리 [3]자재/설비 관리 [4]폐기 관리 [5]종료 [6]폐기 관련 조회 [7]각 단계별 제품 및 종료시간 조회");
+            System.out.println("[1]기준 정보 관리 [2]생산 관리 [3]자재/설비 관리 [4]폐기 관리 [5]종료");
+            System.out.println("[6]폐기 관련 조회 [7]각 단계별 제품 및 종료시간 조회 [8]제품 관련 재료, 공정, 작업자 조회");
             int choice1 = sc.nextInt();
             sc.nextLine();
             switch (choice1) {
@@ -118,15 +121,21 @@ public class Console implements CommandLineRunner {
                     break;
                 case 5: return;
                 case 6:
-                    List<S1Production> s1ProductionList = s1ProductionDao.s1production();
+                    List<S1Waste> s1WasteList = s1WastDao.s1production();
                     System.out.println("======== 대상 정보 조회 =========");
-                    for (S1Production s1Production : s1ProductionList) System.out.println(s1Production);
+                    for (S1Waste s1Waste : s1WasteList) System.out.println(s1Waste);
                     break;
                 case 7:
                     List<S2Step> s2StepList = s2StepDao.s2StepList();
                     System.out.println("======== 대상 정보 조회 =========");
                     for (S2Step s2Step : s2StepList) System.out.println(s2Step);
                     break;
+                case 8:
+                    List<S3Production> s3ProductionList = s3ProductionDao.s3ProductionList();
+                    System.out.println("======== 대상 정보 조회 =========");
+                    for (S3Production s3Production : s3ProductionList) System.out.println(s3Production);
+                    break;
+
             }
 
         }

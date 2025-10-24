@@ -1,6 +1,5 @@
 package com.example.presentation.runing;
 
-import com.example.presentation.model.S1Production;
 import com.example.presentation.model.S2Step;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
@@ -32,7 +30,7 @@ public class S2StepDao {
                 "FROM PRODUCT1 P LEFT JOIN WORKORDER W ON P.PRODUCT_CODE = W.PRODUCT_CODE " +
                 "LEFT JOIN PROCESS PRO ON W.WORK_ORDER_ID = PRO.WORK_ORDER_ID " +
                 "WHERE PRO.PROCESS_STEP = ?";
-        List<S2Step> list = jdbcTemplate.query(query, new Object[]{code}, new S2StepDao.S2StepRowMapper());
+        List<S2Step> list = jdbcTemplate.query(query, new S2StepDao.S2StepRowMapper(), code);
         return list;
     }
 

@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class S1Production {
+public class S1Waste {
     int waste_record;
     LocalDate waste_date;
     String process_step;
