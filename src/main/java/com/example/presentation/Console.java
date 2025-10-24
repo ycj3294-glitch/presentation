@@ -62,7 +62,7 @@ public class Console implements CommandLineRunner {
                                     System.out.println("상품 삭제 : " + (isDelete ? "성공" : "실패"));
                                     break;
                                 case 5:
-                                    return;
+                                    break;
                             }
                             break;
                         // 직원 관리
