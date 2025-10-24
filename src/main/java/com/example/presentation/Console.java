@@ -2,9 +2,11 @@ package com.example.presentation;
 
 import com.example.presentation.model.Employee;
 import com.example.presentation.model.Product;
+import com.example.presentation.model.Production;
 import com.example.presentation.model.Waste;
 import com.example.presentation.runing.EmployeeDao;
 import com.example.presentation.runing.ProductDao;
+import com.example.presentation.runing.ProductionDao;
 import com.example.presentation.runing.WasteDao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -19,13 +21,13 @@ public class Console implements CommandLineRunner {
     private final EmployeeDao employeeDao;
     private final ProductDao productDao;
     private final WasteDao wasteDao;
-
+    private final ProductionDao productionDao;
     @Override
     public void run(String... args) throws Exception {
 
         while (true) {
             System.out.println("====== 콘솔 공장 관리 시스템 ======");
-            System.out.println("[1]기준 정보 관리 [2]생산 관리 [3]자재/설비 관리 [4]폐기 관리 [5]종료");
+            System.out.println("[1]기준 정보 관리 [2]생산 관리 [3]자재/설비 관리 [4]폐기 관리 [5]종료 [6]폐기 관련 조회");
             int choice1 = sc.nextInt();
             sc.nextLine();
             switch (choice1) {
@@ -119,7 +121,13 @@ public class Console implements CommandLineRunner {
                             return;
                     }
                     break;
-
+                case 5:
+                case 6:
+                    List<Production> productionList = productionDao.s1production();
+                    productDao.productList();
+                    System.out.println("======== 대상 정보 조회 =========");
+                    for (Production production : productionList) System.out.println(production);
+                    break;
             }
 
         }
