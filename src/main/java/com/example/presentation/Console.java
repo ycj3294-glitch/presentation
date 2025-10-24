@@ -20,6 +20,9 @@ public class Console implements CommandLineRunner {
     private final S2StepDao s2StepDao;
     private final S3ProductionDao s3ProductionDao;
     private final OperationsDao operationsDao;
+    private final MaterialDao materialDao;
+    private final PerformDao performDao;
+    private final InventoryDao inventoryDao;
 
 
     @Override
@@ -96,8 +99,8 @@ public class Console implements CommandLineRunner {
                             return;
                     }
                     break;
-                    // 생산 관리 (지시 삭제가 없습니다.)
-                case 2 :
+                // 생산 관리 (지시 삭제가 없습니다.)
+                case 2:
                     System.out.println("[1]작업지시 등록 [2]작업지시 상태 변경 [3]작업지시 조회 [4]공정 조회 [5]장비 조회 [6]종료");
                     int prodChoice = sc.nextInt();
                     sc.nextLine();
@@ -125,11 +128,54 @@ public class Console implements CommandLineRunner {
                             System.out.println("======== 장비 조회 =========");
                             for (Equipment e : equipments) System.out.println(e);
                             break;
-                        case 6: break; // 하위 메뉴 종료, 상위 메뉴 반복
+                        case 6:
+                            break; // 하위 메뉴 종료, 상위 메뉴 반복
                     }
                     break;
-                    // 자재/설비 관리
+                // 자재/설비 관리
                 case 3:
+                    System.out.println(("=").repeat(7) + " 자재 관리 시스템 " + ("=").repeat(7));
+                    System.out.println("[1] 자재 등록 [2] 자재 수정 [3] 자재 삭제 [4] 유통기한 조회 [5] 자재 전체 조회");
+                    System.out.println("[6] 창고 재고 조회 [7] 창고 재고 입고 [8] 창고 재고 출고 [9] 설비 상태 조회");
+                    System.out.println("[0] 종료");
+                    System.out.print("선택> ");
+                    int choice = sc.nextInt();
+                    sc.nextLine();
+                    switch (choice) {
+                        case 1:
+                            registerMaterial();
+                            break;
+                        case 2:
+                            updateMaterial();
+                            break;
+                        case 3:
+                            deleteMaterial();
+                            break;
+                        case 4:
+                            findExpiringMaterials();
+                            break;
+                        case 5:
+                            materialList();
+                            break;
+                        case 6:
+                            inventList();
+                            break;
+                        case 7:
+                            registerInventory();
+                            break;
+                        case 8:
+                            deleteInventory();
+                            break;
+                        case 9:
+                            performList();
+                            break;
+                        case 0:
+                            System.out.println("프로그램 종료");
+                            return;
+                        default:
+                            System.out.println("잘못된 입력입니다.");
+                    }
+                    break;
                     // 폐기 관리
                 case 4:
                     System.out.println("[1]폐기 현황 [2]폐기 등록 [3]종료");
@@ -150,7 +196,8 @@ public class Console implements CommandLineRunner {
                             return;
                     }
                     break;
-                case 5: return;
+                case 5:
+                    return;
                 case 6:
                     List<S1Waste> s1WasteList = s1WastDao.s1production();
                     System.out.println("======== 대상 정보 조회 =========");
@@ -172,4 +219,161 @@ public class Console implements CommandLineRunner {
         }
 
     }
+    //자재 관리 메서드
+    private void registerMaterial() {
+        System.out.print("자재 코드: ");
+        String code = sc.nextLine();
+        System.out.print("자재 이름: ");
+        String name = sc.nextLine();
+        System.out.print("단위 (정수): ");
+        int unit = sc.nextInt();
+        sc.nextLine();
+        System.out.print("유통기한 (yyyy-MM-dd): ");
+        String dateStr = sc.nextLine();
+
+        try {
+            java.sql.Date expDate = java.sql.Date.valueOf(dateStr);
+            Material material = new Material(code, name, unit, expDate.toLocalDate());
+            if (materialDao.insertMaterial(material)) {
+                System.out.println("자재가 등록되었습니다.");
+            } else {
+                System.out.println("자재 등록에 실패했습니다.");
+            }
+        } catch (Exception e) {
+            System.out.println("입력한 날짜 형식이 올바르지 않습니다.");
+        }
+    }
+
+    private void updateMaterial() {
+        System.out.print("수정할 자재 코드: ");
+        String code = sc.nextLine();
+
+        // 자재 존재 확인용 리스트 조회 (필요시 별도 메서드로 변경 가능)
+        List<Material> materials = materialDao.materialList();
+        Material target = materials.stream()
+                .filter(m -> m.getMaterial_CODE().equals(code))
+                .findFirst().orElse(null);
+
+        if (target == null) {
+            System.out.println("해당 자재가 존재하지 않습니다.");
+            return;
+        }
+
+        System.out.print("새 자재 이름: ");
+        String name = sc.nextLine();
+        System.out.print("새 단위 (정수): ");
+        int unit = sc.nextInt();
+        sc.nextLine();
+        System.out.print("새 유통기한 (yyyy-MM-dd): ");
+        String dateStr = sc.nextLine();
+
+        try {
+            java.sql.Date expDate = java.sql.Date.valueOf(dateStr);
+            target.setMaterial_NAME(name);
+            target.setUnit(unit);
+            target.setExpiration_DATE(expDate.toLocalDate());
+
+            if (materialDao.updateMaterial(target)) {
+                System.out.println("자재가 수정되었습니다.");
+            } else {
+                System.out.println("자재 수정에 실패했습니다.");
+            }
+        } catch (Exception e) {
+            System.out.println("입력한 날짜 형식이 올바르지 않습니다.");
+        }
+    }
+
+    private void deleteMaterial() {
+        System.out.print("삭제할 자재 코드: ");
+        String code = sc.nextLine();
+
+        if (materialDao.deleteMaterial(code)) {
+            System.out.println("자재가 삭제되었습니다.");
+        } else {
+            System.out.println("자재 삭제에 실패했습니다.");
+        }
+    }
+
+    private void findExpiringMaterials() {
+        System.out.print("유통기한 남은 날짜 수 입력: ");
+        int days = sc.nextInt();
+        sc.nextLine();
+
+        List<Material> expiringMaterials = materialDao.findMaterialsExpiringWithin(days);
+        System.out.println("======== 유통기한 임박 자재 목록 ========");
+        if (expiringMaterials.isEmpty()) {
+            System.out.println("조건에 맞는 자재가 없습니다.");
+        } else {
+            expiringMaterials.forEach(System.out::println);
+        }
+    }
+    private void materialList() {
+        List<Material> materials = materialDao.materialList();
+        if (materials.isEmpty()) {
+            System.out.println("등록된 자재가 없습니다");
+            return;
+        }
+        for (Material e : materials) {
+            System.out.println(e);
+        }
+    }
+
+    private void inventList() {
+        List<Inventory> inventories = inventoryDao.inventoryList();
+        if (inventories.isEmpty()) {
+            System.out.println("등록된 재고가 없습니다");
+            return;
+        }
+        for (Inventory e : inventories) {
+            System.out.println(e);
+        }
+    }
+
+    private void registerInventory() {
+        System.out.print("창고 ID: ");
+        String id = sc.nextLine();
+        System.out.print("자재 코드(동일한 자재코드 입력): ");
+        String code = sc.nextLine();
+        System.out.print("단위 (정수): ");
+        String unit = sc.nextLine();
+        System.out.print("입고날짜 (yyyy-MM-dd): ");
+        String dateStr = sc.nextLine();
+        System.out.print("자재 이름: ");
+        String name = sc.nextLine();
+
+        try {
+            java.sql.Date stockDate = java.sql.Date.valueOf(dateStr);
+            Inventory inventory = new Inventory(id, code, unit, stockDate.toLocalDate(), name);
+            if (inventoryDao.insertInventory(inventory)) {
+                System.out.println("창고에 재고가 입고되었습니다.");
+            } else {
+                System.out.println("입고에 실패했습니다.");
+            }
+        } catch (Exception e) {
+            System.out.println("입력한 날짜 형식이 올바르지 않습니다.");
+        }
+    }
+
+    private void deleteInventory() {
+        System.out.print("출고할 자재 코드(동일한 자재코드 입력): ");
+        String code = sc.nextLine();
+
+        if (inventoryDao.deleteInventory(code)) {
+            System.out.println("창고에 재고가 출고되었습니다.");
+        } else {
+            System.out.println("출고에 실패했습니다.");
+        }
+    }
+
+    private void performList() {
+        List<Performance> performanceList = performDao.performList();
+        if (performanceList.isEmpty()) {
+            System.out.println("등록된 설비 상태 조회가 없습니다");
+            return;
+        }
+        for (Performance e : performanceList) {
+            System.out.println(e);
+        }
+    }
+
 }
