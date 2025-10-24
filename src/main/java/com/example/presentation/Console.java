@@ -121,7 +121,7 @@ public class Console implements CommandLineRunner {
                             return;
                     }
                     break;
-                case 5:
+                case 5: return;
                 case 6:
                     List<S1Production> s1ProductionList = s1ProductionDao.s1production();
                     productDao.productList();
