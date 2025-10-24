@@ -1,6 +1,5 @@
 package com.example.presentation.runing;
 
-import com.example.presentation.model.Employee;
 import com.example.presentation.model.Product;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
