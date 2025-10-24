@@ -42,7 +42,6 @@ public class Console implements CommandLineRunner {
                             switch (choice3) {
                                 case 1:
                                     List<Product> productList = productDao.productList();
-                                    productDao.productList();
                                     System.out.println("======== 상품 목록 조회 =========");
                                     for (Product product : productList) System.out.println(product);
                                     break;
@@ -70,7 +69,6 @@ public class Console implements CommandLineRunner {
                             switch (choice4) {
                                 case 1:
                                     List<Employee> employeeList = employeeDao.employeeList();
-                                    employeeDao.employeeList();
                                     System.out.println("======== 직원 목록 조회 =========");
                                     for (Employee employee : employeeList) System.out.println(employee);
                                     break;
