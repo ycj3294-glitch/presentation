@@ -2,11 +2,11 @@ package com.example.presentation;
 
 import com.example.presentation.model.Employee;
 import com.example.presentation.model.Product;
-import com.example.presentation.model.Production;
+import com.example.presentation.model.S1Production;
 import com.example.presentation.model.Waste;
 import com.example.presentation.runing.EmployeeDao;
 import com.example.presentation.runing.ProductDao;
-import com.example.presentation.runing.ProductionDao;
+import com.example.presentation.runing.S1ProductionDao;
 import com.example.presentation.runing.WasteDao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -21,7 +21,7 @@ public class Console implements CommandLineRunner {
     private final EmployeeDao employeeDao;
     private final ProductDao productDao;
     private final WasteDao wasteDao;
-    private final ProductionDao productionDao;
+    private final S1ProductionDao s1ProductionDao;
     @Override
     public void run(String... args) throws Exception {
 
@@ -123,10 +123,10 @@ public class Console implements CommandLineRunner {
                     break;
                 case 5:
                 case 6:
-                    List<Production> productionList = productionDao.s1production();
+                    List<S1Production> s1ProductionList = s1ProductionDao.s1production();
                     productDao.productList();
                     System.out.println("======== 대상 정보 조회 =========");
-                    for (Production production : productionList) System.out.println(production);
+                    for (S1Production s1Production : s1ProductionList) System.out.println(s1Production);
                     break;
             }
 
